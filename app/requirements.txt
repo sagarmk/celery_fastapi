@@ -1,0 +1,7 @@
+fastapi
+celery
+uvicorn
+flower
+python-dotenv
+pyamqp
+uvicorn

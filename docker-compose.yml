@@ -1,0 +1,56 @@
+version: "2"
+services:
+  # rabbit mq
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"  
+      - "15672:15672"  
+
+  # fast api
+  app:
+    container_name: app
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    restart: always
+    links:
+      - rabbit
+
+  # celery
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A app.worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+    links:
+      - rabbit
+    depends_on:
+      - app
+      - rabbit
+
+  # flower
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A app.worker.celery flower --port=5555
+    volumes:
+      - .:/app
+    ports:
+      - 5555:5555
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+    depends_on:
+      - app
+      - rabbit
+      - celery_worker
