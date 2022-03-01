@@ -1,5 +1,6 @@
 version: "2"
 services:
+
   # rabbit mq
   rabbit:
     hostname: rabbit
