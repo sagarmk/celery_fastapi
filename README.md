@@ -1,4 +1,4 @@
-### fastapi celery rabbitmq flower docker-compose setup
+### (fastapi) (celery) (rabbitmq) (flower) docker setup
 
 > docker-compose build
 
